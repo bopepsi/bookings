@@ -1,13 +1,12 @@
-{{template "base" .}} 
-
-{{define "content"}}
-    <br/>
-    <div class="container">
-    <div class="row">
-        <div class="col">
-        <h1>This is the HOME page</h1>
-        <p>{{index .StringMap "test"}}</p>
-        </div>
+{{template "base" .}} {{define "content"}}
+<br />
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <h1>This is the HOME page</h1>
+      <p>{{index .StringMap "test"}}</p>
     </div>
-    </div>
+  </div>
+  <img src="static/images/benny.jpeg" height="200" width="500" />
+</div>
 {{end}}

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"html/template"
 	"net/http"
 
 	"github.com/bopepsi/bookings/pkg/config"
@@ -18,6 +19,11 @@ func SetupRepo(a *config.AppConfig) {
 	Repo = &Repository{
 		App: a,
 	}
+}
+
+func (this *Repository) Index(w http.ResponseWriter, r *http.Request) {
+	parsed, _ := template.ParseFiles("templates/index.page.html")
+	parsed.Execute(w, nil)
 }
 
 func (this *Repository) Home(w http.ResponseWriter, r *http.Request) {
