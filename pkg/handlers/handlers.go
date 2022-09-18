@@ -31,6 +31,7 @@ func (this *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	remoteIp := r.RemoteAddr
 	this.App.Session.Put(r.Context(), "remote_ip", remoteIp)
 
+	
 	render.RenderTemplate(w, "home.page.html", &models.TemplateData{})
 }
 
@@ -51,6 +52,7 @@ func (this *Repository) About(w http.ResponseWriter, r *http.Request) {
 
 	render.RenderTemplate(w, "about.page.html", &models.TemplateData{
 		StringMap: strMap,
+		CSRFToken: "THIS IS CSRF",
 	})
 }
 
@@ -72,4 +74,8 @@ func (this *Repository) Reservation(w http.ResponseWriter, r *http.Request){
 
 func (this *Repository) Availability(w http.ResponseWriter, r *http.Request){
 	render.RenderTemplate(w, "search-availability.page.html", &models.TemplateData{})
+}
+
+func (this *Repository) PostAvailability(w http.ResponseWriter, r *http.Request){
+	w.Write([]byte("this is from post req"))
 }

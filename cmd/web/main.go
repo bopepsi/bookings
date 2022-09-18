@@ -1,50 +1,65 @@
 package main
 
 import (
+	"encoding/gob"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/bopepsi/bookings/pkg/config"
-	"github.com/bopepsi/bookings/pkg/handlers"
-	"github.com/bopepsi/bookings/pkg/render"
+	"github.com/bopepsi/bookings/internal/config"
+	"github.com/bopepsi/bookings/internal/handlers"
+	"github.com/bopepsi/bookings/internal/models"
+	"github.com/bopepsi/bookings/internal/render"
 )
 
 const portNumber = ":8080"
 
-// Setup app main package wide config
+// var app config.AppConfig
 var app config.AppConfig
-
 var session *scs.SessionManager
 
+// main is the main function
 func main() {
+	// what am I going to put in the session
+	gob.Register(models.Reservation{})
 
+	// change this to true when in production
 	app.InProduction = false
 
-	cache, err := render.CreateTemplateCache()
-	if err != nil {
-		log.Fatal(err)
-	}
-	app.TemplateCache = cache
-	app.UseCache = true
-
+	// set up the session
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
-	session.Cookie.Persist = true // exist after close window
+	session.Cookie.Persist = true
 	session.Cookie.SameSite = http.SameSiteLaxMode
 	session.Cookie.Secure = app.InProduction
 
 	app.Session = session
 
-	// Setup handlers repo and render template cache
-	handlers.SetupRepo(&app)
-	render.SetupTmplCacheMap(&app)
+	tc, err := render.CreateTemplateCache()
+	if err != nil {
+		log.Fatal("cannot create template cache")
+	}
 
-	server := &http.Server{
-		Addr:    ":8080",
+	app.TemplateCache = tc
+	app.UseCache = false
+
+	repo := handlers.NewRepo(&app)
+	handlers.NewHandlers(repo)
+
+	render.NewTemplates(&app)
+
+	fmt.Println(fmt.Sprintf("Staring application on port %s", portNumber))
+
+	srv := &http.Server{
+		Addr:    portNumber,
+		// Handler: routes(&app),
 		Handler: routes(&app),
 	}
-	log.Fatal(server.ListenAndServe())
 
+	err = srv.ListenAndServe()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
