@@ -83,31 +83,36 @@ func (this *postgresDBRepo) SearchAvailabilityByDatesByRoomID(start, end time.Ti
 	return false, nil
 }
 
-func (this *postgresDBRepo) SearchAvailabilityByDates(start, end time.Time, roomId int) (bool, error) {
+func (this *postgresDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) ([]models.Room, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	query := `
 			select 
-				count(*)
-			from 
-				room_restrictions
+				r.id, r.name
+			from
+				rooms r
 			where
-				room_id = $3
-				$1 < end_date and $2 > start_date;
+				r.id not in 
+				(select rr.room_id from room_restrictions rr where $1 < rr.end_date and $2 > rr.start_date)
 			`
 
-	var numRows int
-	err := this.DB.QueryRowContext(ctx, query, start, end, roomId).Scan(&numRows)
+	var rooms []models.Room
+	rows, err := this.DB.QueryContext(ctx, query, start, end)
 
 	if err != nil {
-		return false, err
+		return rooms, err
 	}
 
-	if numRows == 0 {
-		return true, nil
+	for rows.Next() {
+		var room models.Room
+		err := rows.Scan(&room.ID, &room.RoomName)
+		if err != nil {
+			return rooms, err
+		}
+		rooms = append(rooms, room)
 	}
 
-	return false, nil
+	return rooms, nil
 }
