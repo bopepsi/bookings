@@ -60,7 +60,7 @@ func main() {
 	}
 	defer db.SQL.Close()
 	log.Println("Connected to db")
-
+	
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Fatal("cannot create template cache")
