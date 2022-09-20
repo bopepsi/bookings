@@ -10,6 +10,7 @@ import (
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/bopepsi/bookings/internal/config"
+	"github.com/bopepsi/bookings/internal/driver"
 	"github.com/bopepsi/bookings/internal/handlers"
 	"github.com/bopepsi/bookings/internal/helpers"
 	"github.com/bopepsi/bookings/internal/models"
@@ -29,6 +30,10 @@ var errorLog *log.Logger
 func main() {
 	// what am I going to put in the session
 	gob.Register(models.Reservation{})
+	gob.Register(models.User{})
+	gob.Register(models.Restriction{})
+	gob.Register(models.RoomRestriction{})
+	gob.Register(models.Room{})
 
 	// change this to true when in production
 	app.InProduction = false
@@ -48,6 +53,14 @@ func main() {
 
 	app.Session = session
 
+	// connect to database
+	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=bookings user=bopepsi password=")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.SQL.Close()
+	log.Println("Connected to db")
+
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Fatal("cannot create template cache")
@@ -56,10 +69,10 @@ func main() {
 	app.TemplateCache = tc
 	app.UseCache = false
 
-	repo := handlers.NewRepo(&app)
+	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
 
-	render.NewTemplates(&app)
+	render.NewRenderer(&app)
 	helpers.NewHelpers(&app)
 
 	fmt.Println(fmt.Sprintf("Staring application on port %s", portNumber))

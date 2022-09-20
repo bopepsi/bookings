@@ -1,7 +1,5 @@
 package repository
 
-type DatabaseRepo interface{
-
+type DatabaseRepo interface {
+	AllUsers() bool
 }
-
-
