@@ -9,3 +9,7 @@ Build n Go version 1.19
 -Uses [Alex Edward SCS](github.com/alexedwards/scs/v2)
 
 -Uses [nosurf](github.com/justinas/nosurf)
+
+-Uses [buffalo/sada/pop](https://github.com/gobuffalo/pop)
+
+-Uses [pgx](github.com/jackc/pgx/v4)
