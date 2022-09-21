@@ -2,6 +2,7 @@ package dbrepo
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/bopepsi/bookings/internal/models"
@@ -65,22 +66,24 @@ func (this *postgresDBRepo) SearchAvailabilityByDatesByRoomID(start, end time.Ti
 			from 
 				room_restrictions
 			where
-				room_id = $3
-				$1 < end_date and $2 > start_date;
+				room_id = $1 and
+				$2 < end_date and $3 > start_date;
 			`
 
 	var numRows int
-	err := this.DB.QueryRowContext(ctx, query, start, end, roomId).Scan(&numRows)
+	err := this.DB.QueryRowContext(ctx, query, roomId, start, end).Scan(&numRows)
 
 	if err != nil {
+		fmt.Println(err)
 		return false, err
 	}
-
+	fmt.Println(numRows)
 	if numRows == 0 {
 		return true, nil
+	} else {
+		return false, nil
 	}
 
-	return false, nil
 }
 
 func (this *postgresDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) ([]models.Room, error) {
@@ -115,4 +118,22 @@ func (this *postgresDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) 
 	}
 
 	return rooms, nil
+}
+
+func (this *postgresDBRepo) GetRoomByID(id int) (models.Room, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var room models.Room
+	query := `select * from rooms where id = $1`
+
+	err := this.DB.QueryRowContext(ctx, query, id).Scan(&room.ID, &room.RoomName, &room.CreatedAt, &room.UpdatedAt)
+
+	if err != nil {
+		return room, err
+	}
+
+	return room, nil
+
 }
