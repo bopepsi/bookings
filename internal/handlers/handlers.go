@@ -66,7 +66,7 @@ func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 
 // Reservation renders the make a reservation page and displays form
 func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
-	
+
 	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
 		helpers.ServerError(w, errors.New("Cannot get reservation from session"))
@@ -183,6 +183,39 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		helpers.ServerError(w, err)
 		return
 	}
+
+	htmlMsgCustomer := fmt.Sprintf(`
+	<strong>Confirmation</strong>
+	Dear %s, <br/>
+	This is confirm your reservation from %s to %s`, res.FirstName,
+		res.StartDate.Format("2006-01-02"), res.EndDate.Format("2006-01-02"))
+
+	// send email notifications
+	msgToCustomer := models.MailData{
+		To:       res.Email,
+		From:     "bo@gmail.com",
+		Subject:  "Reservation Confirmation",
+		Content:  htmlMsgCustomer,
+		Template: "basic.html",
+	}
+
+	htmlMsgOwner := fmt.Sprintf(`
+	<strong>Confirmation</strong>
+	Hi there! <br/>
+	A reservation just made from %s to %s by %s on room %s.`,
+		res.StartDate.Format("2006-01-02"), res.EndDate.Format("2006-01-02"), res.FirstName, res.Room.RoomName)
+
+	msgToOwner := models.MailData{
+		To:       "owner@gmail.com",
+		From:     "bo@gmail.com",
+		Subject:  "Reservation Notice",
+		Content:  htmlMsgOwner,
+		Template: "basic.html",
+	}
+
+	m.App.MailChan <- msgToCustomer
+	
+	m.App.MailChan <- msgToOwner
 
 	http.Redirect(w, r, "/reservation-summary", http.StatusSeeOther)
 }

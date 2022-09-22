@@ -42,15 +42,6 @@ func main() {
 	fmt.Println("Starting msg listener")
 	listenForMail()
 
-	msg := models.MailData{
-		To:      "jogn@g.ca",
-		From:    "bo@gmail.com",
-		Subject: "Something",
-		Content: "content",
-	}
-
-	app.MailChan <- msg
-
 	// change this to true when in production
 	app.InProduction = false
 
