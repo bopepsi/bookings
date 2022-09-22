@@ -214,7 +214,7 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	m.App.MailChan <- msgToCustomer
-	
+
 	m.App.MailChan <- msgToOwner
 
 	http.Redirect(w, r, "/reservation-summary", http.StatusSeeOther)
@@ -388,4 +388,14 @@ func (m *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
 	m.App.Session.Put(r.Context(), "reservation", res)
 	http.Redirect(w, r, "/make-reservation", http.StatusSeeOther)
 
+}
+
+func (m *Repository) ShowLogin(w http.ResponseWriter, r *http.Request) {
+
+	email := r.Form.Get("email")
+	password := r.Form.Get("password")
+
+	render.Template(w, r, "login.page.html", &models.TemplateData{
+		Form: forms.New(nil),
+	})
 }
