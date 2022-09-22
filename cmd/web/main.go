@@ -35,6 +35,22 @@ func main() {
 	gob.Register(models.RoomRestriction{})
 	gob.Register(models.Room{})
 
+	mailChan := make(chan models.MailData)
+	app.MailChan = mailChan
+	defer close(app.MailChan)
+
+	fmt.Println("Starting msg listener")
+	listenForMail()
+
+	msg := models.MailData{
+		To:      "jogn@g.ca",
+		From:    "bo@gmail.com",
+		Subject: "Something",
+		Content: "content",
+	}
+
+	app.MailChan <- msg
+
 	// change this to true when in production
 	app.InProduction = false
 
@@ -60,7 +76,7 @@ func main() {
 	}
 	defer db.SQL.Close()
 	log.Println("Connected to db")
-	
+
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Fatal("cannot create template cache")

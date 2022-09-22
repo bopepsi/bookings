@@ -71,7 +71,7 @@ func SetupTmplCacheMap(a *config.AppConfig) {
 }
 
 // Best way to implement render
-func RenderTemplate(w http.ResponseWriter, page string, td *models.TemplateData) {
+func Template(w http.ResponseWriter, page string, td *models.TemplateData) {
 	// create a tmplate cache or read from app wide config
 
 	var cache map[string]*template.Template

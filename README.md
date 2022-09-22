@@ -13,3 +13,5 @@ Build n Go version 1.19
 -Uses [buffalo/sada/pop](https://github.com/gobuffalo/pop)
 
 -Uses [pgx](github.com/jackc/pgx/v4)
+
+-Uses [simple mail](ggithub.com/xhit/go-simple-mail/v2 )
