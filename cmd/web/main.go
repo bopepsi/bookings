@@ -87,11 +87,14 @@ func main() {
 	srv := &http.Server{
 		Addr: portNumber,
 		// Handler: routes(&app),
-		Handler: routes(&app),
+		Handler: routes(),
 	}
 
 	err = srv.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// r := routes()
+	// log.Fatal(http.ListenAndServe(":8080", r))
 }

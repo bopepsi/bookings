@@ -6,9 +6,9 @@ Build n Go version 1.19
 
 -Uses [chi router](github.com/go-chi/chi/v5)
 
--Uses [Alex Edward SCS](github.com/alexedwards/scs/v2)
+-Uses [nosurf](github.com/justinas/nosurf)f
 
--Uses [nosurf](github.com/justinas/nosurf)
+-Uses [Alex Edward SCS](github.com/alexedwards/scs/v2)
 
 -Uses [buffalo/sada/pop](https://github.com/gobuffalo/pop)
 

@@ -3,13 +3,12 @@ package main
 import (
 	"net/http"
 
-	"github.com/bopepsi/bookings/internal/config"
 	"github.com/bopepsi/bookings/internal/handlers"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 )
 
-func routes(app *config.AppConfig) http.Handler {
+func routes() http.Handler {
 	mux := chi.NewRouter()
 
 	mux.Use(middleware.Recoverer)

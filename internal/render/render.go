@@ -71,7 +71,9 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 
 	var templatesCache map[string]*template.Template = map[string]*template.Template{}
 
-	pages, err := filepath.Glob("templates/*.page.html")
+	pages, err := filepath.Glob("./templates/*.page.html")
+	// pages, err := filepath.Glob("  templates/*.page.html")
+	fmt.Println(pages)
 	if err != nil {
 		return nil, err
 	}
